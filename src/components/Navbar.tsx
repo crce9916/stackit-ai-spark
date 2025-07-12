@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Search, User, Plus, Home, HelpCircle, Settings } from 'lucide-react';
+import { Bell, Search, User, Plus, Home, HelpCircle, Settings, Hash, Shield, BookOpen } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
   const notificationCount = 3; // Mock notification count
   
   const isActive = (path: string) => location.pathname === path;
@@ -33,7 +35,7 @@ const Navbar = () => {
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link 
               to="/" 
               className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -57,6 +59,18 @@ const Navbar = () => {
               <HelpCircle className="h-4 w-4" />
               <span>Questions</span>
             </Link>
+
+            <Link 
+              to="/tags" 
+              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                isActive('/tags') 
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              <Hash className="h-4 w-4" />
+              <span>Tags</span>
+            </Link>
             
             <Link 
               to="/ask" 
@@ -73,64 +87,61 @@ const Navbar = () => {
 
           {/* Search Bar */}
           <div className="hidden lg:flex items-center space-x-4 flex-1 max-w-lg mx-8">
-            <div className="relative w-full">
+            <Link to="/search" className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search questions, tags, or users..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
-              />
-            </div>
+              <div className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/70 text-gray-500 cursor-pointer hover:bg-white transition-colors">
+                Search questions, tags, or users...
+              </div>
+            </Link>
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* Notifications */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative p-2">
-                  <Bell className="h-5 w-5 text-gray-600" />
-                  {notificationCount > 0 && (
-                    <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 flex items-center justify-center rounded-full">
-                      {notificationCount}
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <div className="p-3 border-b">
-                  <h3 className="font-semibold text-gray-900">Notifications</h3>
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  <DropdownMenuItem className="p-3 cursor-pointer">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">New answer on your question</p>
-                      <p className="text-xs text-gray-500 mt-1">Someone answered "How to implement JWT authentication in React?"</p>
-                      <p className="text-xs text-blue-600 mt-1">2 minutes ago</p>
+            {user && (
+              <>
+                {/* Notifications */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="relative p-2">
+                      <Bell className="h-5 w-5 text-gray-600" />
+                      {notificationCount > 0 && (
+                        <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 flex items-center justify-center rounded-full">
+                          {notificationCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-80">
+                    <div className="p-3 border-b">
+                      <h3 className="font-semibold text-gray-900">Notifications</h3>
                     </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="p-3 cursor-pointer">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Your answer was upvoted</p>
-                      <p className="text-xs text-gray-500 mt-1">+5 reputation points</p>
-                      <p className="text-xs text-blue-600 mt-1">1 hour ago</p>
+                    <div className="max-h-64 overflow-y-auto">
+                      <DropdownMenuItem className="p-3 cursor-pointer">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">New answer on your question</p>
+                          <p className="text-xs text-gray-500 mt-1">Someone answered "How to implement JWT authentication in React?"</p>
+                          <p className="text-xs text-blue-600 mt-1">2 minutes ago</p>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="p-3 cursor-pointer">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">Your answer was upvoted</p>
+                          <p className="text-xs text-gray-500 mt-1">+5 reputation points</p>
+                          <p className="text-xs text-blue-600 mt-1">1 hour ago</p>
+                        </div>
+                      </DropdownMenuItem>
                     </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="p-3 cursor-pointer">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">New question in React tag</p>
-                      <p className="text-xs text-gray-500 mt-1">Check out the latest React question</p>
-                      <p className="text-xs text-blue-600 mt-1">3 hours ago</p>
+                    <div className="p-3 border-t">
+                      <Link to="/notifications">
+                        <Button variant="ghost" size="sm" className="w-full text-blue-600">
+                          View All Notifications
+                        </Button>
+                      </Link>
                     </div>
-                  </DropdownMenuItem>
-                </div>
-                <div className="p-3 border-t">
-                  <Button variant="ghost" size="sm" className="w-full text-blue-600">
-                    View All Notifications
-                  </Button>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
 
             {/* User Menu */}
             <DropdownMenu>
@@ -140,26 +151,57 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <span>Sign Out</span>
-                </DropdownMenuItem>
+                {user ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to={`/profile/${user.id}`} className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings" className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/guidelines" className="flex items-center">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        <span>Guidelines</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => signOut()}>
+                      <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem>
+                      <span>Sign In</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <span>Sign Up</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
             {/* Mobile Menu */}
             <div className="md:hidden">
-              <Button variant="ghost" size="sm">
-                <Search className="h-5 w-5" />
-              </Button>
+              <Link to="/search">
+                <Button variant="ghost" size="sm">
+                  <Search className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
